@@ -1,3 +1,6 @@
+using ManageOrdersAPI.Database;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace ManageOrdersAPI
 {
@@ -8,6 +11,23 @@ namespace ManageOrdersAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddDbContext<ManageOrdersDbContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // builder.WebHost.ConfigureKestrel(serverOptions =>
+            // {
+            //     serverOptions.ListenAnyIP(5001, listenOptions =>
+            //     {
+            //         listenOptions.UseHttps();
+            //     });
+            // 
+            //     serverOptions.ListenLocalhost(5001, listenOptions =>
+            //     {
+            //         listenOptions.UseHttps();
+            //     });
+            // });
+            // builder.WebHost.UseKestrel();
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -27,6 +47,7 @@ namespace ManageOrdersAPI
 
             app.UseAuthorization();
 
+            app.UseCors(builder => builder.AllowAnyOrigin());
 
             app.MapControllers();
 
