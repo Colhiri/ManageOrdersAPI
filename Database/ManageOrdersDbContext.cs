@@ -15,16 +15,19 @@ namespace ManageOrdersAPI.Database
                 warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         }
 
+        /// <summary>
+        /// Заполнение базы
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<OrderModel>(entity =>
             {
-                entity.HasKey(e => e.IdOrder); // Установка первичного ключа
+                entity.HasKey(e => e.IdOrder);
             });
 
-            // Инициализация базы данных с 10 сущностями
             modelBuilder.Entity<OrderModel>().HasData(
                 new OrderModel
                 {

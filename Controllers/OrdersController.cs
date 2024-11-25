@@ -1,10 +1,12 @@
 using ManageOrdersAPI.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace ManageOrdersAPI.Controllers
 {
+    /// <summary>
+    /// Управление заявками API
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class OrdersController : ControllerBase
@@ -16,16 +18,21 @@ namespace ManageOrdersAPI.Controllers
             _context = context;
         }
 
-        // 1. Получение всех заявок
+        /// <summary>
+        /// Получить все заявки
+        /// </summary>
+        /// <returns>Все заявки</returns>
         [HttpGet]
         public async Task<IActionResult> GetOrders()
         {
             return Ok(await _context.Orders.ToListAsync());
         }
 
-        
-        
-        // 3. Регистрация новой заявки
+        /// <summary>
+        /// Создание новой заявки
+        /// </summary>
+        /// <param name="order">Значения для новой заявки</param>
+        /// <returns>Ничего</returns>
         [HttpPost]
         public async Task<IActionResult> CreateOrder(OrderModel order)
         {
@@ -35,39 +42,54 @@ namespace ManageOrdersAPI.Controllers
             return CreatedAtAction(nameof(GetOrders), new { id = order.IdOrder }, order);
         }
 
-        // 4. Обновление статуса заявки
+        /// <summary>
+        /// Передача на исполнение
+        /// </summary>
+        /// <param name="id">Идентификатор заявки</param>
+        /// <param name="status">Новый статус</param>
+        /// <returns>Ничего</returns>
         [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] string status)
+        public async Task<IActionResult> UpdateOrderStatus(int id, OrderModel updateOrder)
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return NotFound();
 
-            order.Status = status;
+            order.Status = updateOrder.Status;
+            order.NameExecutor = updateOrder.NameExecutor;
+
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // 5. Редактирование заявки
+        /// <summary>
+        /// Редактировать заявку
+        /// </summary>
+        /// <param name="id">Идентификатор заявки</param>
+        /// <param name="updatedOrder">Новые значения для заявки</param>
+        /// <returns>Ничего</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrder(int id, OrderModel updatedOrder)
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return NotFound();
 
-            if (order.Status != "Новая")
-                return BadRequest("Редактировать можно только заявки со статусом 'Новая'.");
-
             order.NameClient = updatedOrder.NameClient;
             order.NameExecutor= updatedOrder.NameExecutor;
             order.PickupAddress = updatedOrder.PickupAddress;
             order.DeliveryAddress = updatedOrder.DeliveryAddress;
             order.PickupAddress = updatedOrder.PickupAddress;
+            order.Status = updatedOrder.Status;
+            order.CancelReason = updatedOrder.CancelReason;
 
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // 6. Удаление заявки
+        /// <summary>
+        /// Удалить заявку
+        /// </summary>
+        /// <param name="id">Идентификатор заявки</param>
+        /// <returns>Ничего</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
