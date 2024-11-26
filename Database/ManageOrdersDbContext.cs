@@ -7,6 +7,7 @@ namespace ManageOrdersAPI.Database
         public DbSet<OrderModel> Orders { get; set; }
         public ManageOrdersDbContext(DbContextOptions<ManageOrdersDbContext> options) : base(options) 
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
